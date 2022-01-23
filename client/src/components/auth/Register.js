@@ -1,9 +1,22 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
+import { Navigate } from 'react-router-dom';
 import AlertContext from '../../context/alert/alertContext';
+import AuthContext from '../../context/auth/authContext';
 
 const Register = () => {
   const alertContext = useContext(AlertContext);
+  const authContext = useContext(AuthContext);
+
   const { setAlert } = alertContext;
+  const { register, error, clearErrors, isAuthenticated } = authContext;
+
+  useEffect(() => {
+    if (error === 'User already exists') {
+      setAlert(error, 'danger');
+      clearErrors();
+    }
+  }, [error, isAuthenticated]);
+
   const [user, setUser] = useState({
     name: '',
     email: '',
@@ -24,10 +37,17 @@ const Register = () => {
     } else if (password !== password2) {
       setAlert('The password does not match', 'danger');
     } else {
-      console.log('Register submit');
+      register({
+        name,
+        email,
+        password,
+        password2,
+      });
     }
   };
-
+  {
+    if (isAuthenticated) return <Navigate to='/' />;
+  }
   return (
     <div className='form-container'>
       <h1>
